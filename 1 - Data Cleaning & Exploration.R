@@ -1,25 +1,12 @@
-setwd("D:/Università/Tesi/R/Dati/Da usare/Pulito")
 library("readxl")
-library("sjmisc") #str_contains
+library("sjmisc")
 library("fastDummies")
 library("GGally")
 library("dplyr")
 
-# library("car")
-#  #gsub
-# library("sjstats")
-# library("ggplot2")
-# library("tidyverse")
-# library("neuralnet") # per rete neurale
-# library("boot") # per cross validation
-# library("plyr") # per cross val
-# library("matrixStats") # per cross val
-# library("arm")
-# library("stats")
-
 #!diagnostics off 
 
-# importo dataset
+# import dataset
 bomporto <- read_excel("bomporto.xlsx",
                        col_types = c("numeric","text", "text", "text", 
                                      "text", "text", "text", "numeric", 
@@ -40,7 +27,7 @@ bastiglia <- read_excel("bastiglia.xlsx",
                                       "numeric"))
 str(bastiglia)
 
-# caratteri in minuscolo
+# tolower
 bastiglia$indirizzo <- tolower(bastiglia$indirizzo)
 bastiglia$comune <- tolower(bastiglia$comune)
 bastiglia$uso <- tolower(bastiglia$uso)
@@ -50,17 +37,18 @@ bomporto$comune <- tolower(bomporto$comune)
 bomporto$uso <- tolower(bomporto$uso)
 bomporto$tipologia_strutturale <- tolower(bomporto$tipologia_strutturale)
 
-# se ci sono rows con comune=NA -> lo sostituisco col nome del comune
+# add municipality where value = NA
 bastiglia$comune[is.na(bastiglia$comune)] = "bastiglia"
 bomporto$comune[is.na(bomporto$comune)] = "bomporto"
 
-# elimino gli spazi nella tipologia strutturale
+# delete spaces
 bomporto$tipologia_strutturale <- gsub(" ", "", bomporto$tipologia_strutturale, 
                                        fixed = T)
 bastiglia$tipologia_strutturale <- gsub(" ", "", bastiglia$tipologia_strutturale, 
                                         fixed = T)
 
-# uniformo la tipologia strutturale in 4 classi: cm, m, c, altro
+# categorize structural typology
+# Bastiglia
 for (i in 1:nrow(bastiglia)){
   if(str_contains(bastiglia$tipologia_strutturale[i], c("cemento","muratura"), 
                   logic = "and") == TRUE){
@@ -79,7 +67,7 @@ for (i in 1:nrow(bastiglia)){
     bastiglia$tipologia_strutturale[i] = "m"
   }
 }
-# uniformo la tipologia strutturale in 4 classi: cm, m, c (sono le uniche miste, altro già è sistemato)
+# Bomporto
 for (i in 1:nrow(bomporto)){
   if(str_contains(bomporto$tipologia_strutturale[i], c("cemento","muratura"), 
                   logic = "and") == TRUE){
@@ -93,7 +81,7 @@ for (i in 1:nrow(bomporto)){
   }
 }
 
-# al posto di avere il max e il min eur/mq, creo una variabile che prendo il valore medio
+# add average property value
 bastiglia$compr_max_mq <- bastiglia$compr_max_mq*bastiglia$superficie
 bastiglia$compr_min_mq <- bastiglia$compr_min_mq*bastiglia$superficie
 bastiglia$valore_immobile <- rowMeans(bastiglia[, c('compr_max_mq', 
@@ -103,7 +91,7 @@ bomporto$compr_min_mq <- bomporto$compr_min_mq*bomporto$superficie
 bomporto$valore_immobile <- rowMeans(bomporto[, c('compr_max_mq', 
                                                   'compr_min_mq')], na.rm = T)
 
-# come sopra ma con costo di costruzione
+# add average construction cost
 bastiglia$costo_max <- bastiglia$costo_max*bastiglia$superficie
 bastiglia$costo_min <- bastiglia$costo_min*bastiglia$superficie
 bastiglia$costo_medio <- rowMeans(bastiglia[, c('costo_max', 'costo_min')], na.rm = T)
@@ -112,14 +100,12 @@ bomporto$costo_max <- bomporto$costo_max*bomporto$superficie
 bomporto$costo_min <- bomporto$costo_min*bomporto$superficie
 bomporto$costo_medio <- rowMeans(bomporto[, c('costo_max', 'costo_min')], na.rm = T)
 
+# add address 
 indirizzo_bastiglia <- bastiglia[, c("id", "ID_univoco", "indirizzo", "civico", "comune")]
 indirizzo_bomporto <- bomporto[, c("id", "ID_univoco", "indirizzo", "civico", "comune")]
 indirizzo <- rbind(indirizzo_bastiglia, indirizzo_bomporto)
 
-# la pendenza la trovo come dislivello/distanza*100
-# i danni mobili li ritrovo in qualche modo alla fine
-# indirizzo e comune non servono, a localizzare c'è la distanza dal fiume
-# quindi seleziono solo le colonne che mi servono per analisi generale e le riordino
+#keep only the vars useful to the analysis
 bastiglia <- bastiglia[, c("id", "tipologia_strutturale", "superficie",
                            "altezza_acqua_cm", "distanza_secchia_mt",
                            "dislivello_rispetto_argini", "area", "edfc",
@@ -129,13 +115,12 @@ bomporto <- bomporto[, c("id", "tipologia_strutturale", "superficie",
                          "dislivello_rispetto_argini", "area", "edfc",
                          "valore_immobile", "costo_medio", "danno_beni_immobili")]
 
-# tolgo gli na. potrei provare a ricostruirli con una regressione o altri metodi, 
-# ma non è lo scopo principale del lavoro.
+# delete NA values
 bastiglia_no_na <- na.omit(bastiglia)
 bomporto_no_na <- na.omit(bomporto)
 
-# trasformo la tipologia in matrice indicatrice 0-1 così da rendere corretta 
-# la distanza negli algoritmi. se assegnassi valori 1-4, il 4 avrebbe più 
+# trasformo la tipologia in matrice indicatrice 0-1 cosÃ¬ da rendere corretta 
+# la distanza negli algoritmi. se assegnassi valori 1-4, il 4 avrebbe piÃ¹ 
 # importanza
 bastiglia_numeric <- bastiglia_no_na[, c("id","superficie", "altezza_acqua_cm",
                                          "distanza_secchia_mt", "dislivello_rispetto_argini",
@@ -194,7 +179,7 @@ quantifica_bomporto <- function(colonna){
 
 nuovo_bomporto = quantifica_bomporto(bomporto_no_na$tipologia_strutturale)
 bomporto_touse <- merge(nuovo_bomporto, bomporto_numeric, by = "id")
-bomporto_touse$cm <- 0 # aggiungo cm al tipo in quanto non è presente in bomporto
+bomporto_touse$cm <- 0 # aggiungo cm al tipo in quanto non Ã¨ presente in bomporto
 # riposizione la colonna cm
 bomporto_touse <- bomporto_touse[, c("id", "altro", "c", "cm", "m", "superficie", "altezza_acqua_cm",
                                    "distanza_secchia_mt", "dislivello_rispetto_argini",
@@ -218,13 +203,13 @@ remove(bastiglia_touse)
 remove(bomporto_touse)
 
 ######################################### OUTLIER ############################################
-# essendo più variabili, procedo con analisi multivariata utilizzando mahalonobis
+# essendo piÃ¹ variabili, procedo con analisi multivariata utilizzando mahalonobis
 # studiato lof (con varianti cof e loci), (h)dbscan, 
 # isolation forest, clustering gerarchico.
-# ho scelto mahalanobis perchè gli altri sono sviluppati principalmente per clusterizzazione
+# ho scelto mahalanobis perchÃ¨ gli altri sono sviluppati principalmente per clusterizzazione
 # inoltre restituisce un risultato accettabile
 # secondo i papers studiati, mahalonobis garantisce il risultato migliore, anche se ovviamente
-# non è perfetto
+# non Ã¨ perfetto
 
 df <- dati_bin[, c("altro", "c", "cm", "m", "superficie", "altezza_acqua_cm",
                    "distanza_secchia_mt", "dislivello_rispetto_argini",
@@ -236,7 +221,7 @@ covar <- cov(df)
 
 distances <- mahalanobis(x = df , center = center , cov = covar, tol = 1e-30)
 # tol permette alla funzione di funzionare, altrimenti si avrebbe 
-# l'errore "il sistema è numericamente singolare" https://bit.ly/3wTjnj8
+# l'errore "il sistema Ã¨ numericamente singolare" https://bit.ly/3wTjnj8
 cutoff <- qchisq(p = 0.99 , df = ncol(df))
 
 dati_bin$mahalanobis <- distances
