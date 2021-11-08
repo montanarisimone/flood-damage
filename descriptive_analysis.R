@@ -1,7 +1,0 @@
-library("readxl")
-library("sjmisc")
-library("fastDummies")
-library("GGally")
-library("dplyr")
-
-dat <- fld
