@@ -27,6 +27,7 @@ bastiglia <- read_excel("bastiglia.xlsx",
                                       "numeric"))
 str(bastiglia)
 
+### DATA CLEANING
 # tolower
 bastiglia$indirizzo <- tolower(bastiglia$indirizzo)
 bastiglia$comune <- tolower(bastiglia$comune)
@@ -198,3 +199,97 @@ remove(bastiglia_touse)
 remove(bomporto_touse)
 
 ### OUTLIER ANALYSIS 
+df <- dati_bin[, c("altro", "c", "cm", "m", "superficie", "altezza_acqua_cm",
+                   "distanza_secchia_mt", "dislivello_rispetto_argini",
+                   "area", "edfc", "valore_immobile",
+                   "costo_medio", "danno_beni_immobili")]
+center <- colMeans(df)
+covar <- cov(df)
+distances <- mahalanobis(x = df , center = center , cov = covar, tol = 1e-30)
+cutoff <- qchisq(p = 0.99 , df = ncol(df))
+
+# add var 'outliers' in dati_bin
+dati_bin$mahalanobis <- distances
+dati_bin$outlier <- ifelse(dati_bin$mahalanobis > cutoff, "1", "0")
+# delete var 
+dati_bin <- dati_bin[, c("id", "altro", "c", "cm", "m", "superficie", "altezza_acqua_cm",
+                         "distanza_secchia_mt", "dislivello_rispetto_argini",
+                         "area", "edfc", "valore_immobile",
+                         "costo_medio", "danno_beni_immobili", "outlier")]
+table(dati_bin$outlier)
+  
+# add var 'outliers' in dati_cat
+dati_cat$mahalanobis <- distances
+dati_cat$outlier <- ifelse(dati_cat$mahalanobis > cutoff, "1", "0")
+dati_cat <- merge(dati_cat[, c("id", "tipologia_strutturale")], dati_bin[, c("id", 
+                                                                             "superficie", "altezza_acqua_cm",
+                                                                             "distanza_secchia_mt", "dislivello_rispetto_argini",
+                                                                             "area", "edfc", "valore_immobile",
+                                                                             "costo_medio", "danno_beni_immobili", "outlier")], by = "id")
+  
+### DESCRIPTIVE ANALYSIS
+# add var 'relative damage'
+dati_bin$danno_relativo_valore <- dati_bin$danno_beni_immobili/dati_bin$valore_immobile
+dati_bin$danno_relativo_costo <- dati_bin$danno_beni_immobili/dati_bin$costo_medio
+dati_bin <- dati_bin[, c("id", "altro", "c", "cm", "m", "superficie", "altezza_acqua_cm",
+                         "distanza_secchia_mt", "dislivello_rispetto_argini",
+                         "area", "edfc", "valore_immobile",
+                         "costo_medio", "danno_relativo_valore", "danno_relativo_costo", 
+                         "danno_beni_immobili", "outlier")]
+
+dati_cat$danno_relativo_valore <- dati_cat$danno_beni_immobili/dati_cat$valore_immobile
+dati_cat$danno_relativo_costo <- dati_cat$danno_beni_immobili/dati_cat$costo_medio
+dati_cat <- dati_cat[, c("id", "tipologia_strutturale", "superficie", "altezza_acqua_cm",
+                         "distanza_secchia_mt", "dislivello_rispetto_argini",
+                         "area", "edfc", "valore_immobile",
+                         "costo_medio", "danno_relativo_valore", "danno_relativo_costo", 
+                         "danno_beni_immobili", "outlier")]
+
+# median
+summary(dati_cat[, 3:12])
+medians <- aggregate(dati_cat[, 3:12], 
+                     list(dati_cat$tipologia_strutturale),
+                     median, simplify = T)
+names(medians)[1] <- "tipo"
+medians
+  
+# density and freq plots
+options(scipen = 100)
+barplot(prop.table(table(dati_cat$tipologia_strutturale)),
+        ylim = c(0,1), col = rainbow(4))
+par(mfrow=c(2,4))
+hist(dati_bin[dati_bin$outlier==0,]$superficie, n = 100, freq = F, main = "superficie", xlab = "mq")
+hist(dati_bin[dati_bin$outlier==0,]$altezza_acqua_cm, n = 20, freq = F, main = "altezza acqua", xlab = "cm")
+hist(dati_bin[dati_bin$outlier==0,]$distanza_secchia_mt, n = 30, freq = F, 
+     xlab = "mt", xlim = c(0, 6000), main = "distanza fiume")
+hist(dati_bin[dati_bin$outlier==0,]$valore_immobile, n = 30, freq = F, main = "valore", xlab = "\u20ac")
+hist(dati_bin[dati_bin$outlier==0,]$dislivello_rispetto_argini, main = "dislivello", xlab = "mt", freq = F, n = 20)
+hist(dati_bin[dati_bin$outlier==0,]$area, main = "area", xlab = "mq", freq = F, n = 20)
+hist(dati_bin[dati_bin$outlier==0,]$edfc, main = "edifici", n = 20, xlab = "# edifici", freq = F)
+hist(dati_bin[dati_bin$outlier==0,]$danno_relativo_valore, n = 20, freq = F, main = "danno relativo", xlab = "")
+
+par(mfrow=c(2,4))
+boxplot(dati_cat$superficie, main = "superficie", ylab = "mq")
+boxplot(dati_cat$altezza_acqua_cm, main = "altezza acqua", ylab = "mt")
+boxplot(dati_cat$distanza_secchia_mt, main = "distanza fiume", ylab = "mt")
+boxplot(dati_cat$valore_immobile, main = "valore immobile", ylab = "\u20ac")
+boxplot(dati_cat$dislivello_rispetto_argini, main = "dislivello", ylab = "mt")
+boxplot(dati_cat$area, main = "area", ylab = "mq")
+boxplot(dati_cat$edfc, main = "edifici")
+boxplot(dati_cat$danno_relativo_valore, main = "danno relativo")
+  
+# correlation plot
+cor <- round(cor(dati_cat[, c(3:9, 11)]), 2)
+library("RColorBrewer")
+library("corrplot")
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", 
+                          "#4477AA"))
+colnames(cor) <- c("superficie", "altezza acqua", "distanza fiume", "dislivello", 
+                   "area", "edifici", "valore", "danno relativo")
+rownames(cor) <- c("superficie", "altezza acqua", "distanza fiume", "dislivello", 
+                   "area", "edifici", "valore", "danno relativo")
+
+par(mfrow=c(1,1))
+corrplot(cor, type = "lower", method = "color", order = "alphabet",
+         diag = F, tl.col = "black", tl.srt = 5, addCoef.col = T,
+         col = col(200))
