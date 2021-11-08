@@ -125,11 +125,13 @@ for(i in 1:nrow(imp4)){
   }else{imp4$name[i] = imp4$names[i]}
 }
 
+# plot vars importance
 barplot(height=imp4$gain, names=imp4$name, 
         col="orange",
         las=1, horiz = F, ylim = c(0,0.27))
 title("XGB Variable Importance", adj = 0)
 
+# scaling vars importance
 scaling<- function(x){
   out=(x-min(x))/(max(x)-min(x))
 }
