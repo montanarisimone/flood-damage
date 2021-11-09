@@ -94,3 +94,64 @@ medie_clusters <- dati %>%
   summarise_all(mean)
 medie_clusters <- as.matrix(medie_clusters)
 
+# belonging matrix
+clusterizzazione <- function(colonna){
+  matrice = matrix(nrow=nrow(dati), ncol=length(names(table(dati$hc))))
+  elementi = list(names(table(dati$hc)))
+  
+  for(i in 1:nrow(dati)){
+    for(k in 1:length(names(table(dati$hc)))){
+      if(colonna[i] == elementi[[1]][k]){
+        matrice[i,k] = 1
+      }else{matrice[i,k]=0}
+    }
+  }
+  
+  #  colnames(matrice) = elementi
+  output = as.data.frame(matrice)
+  colnames(output) = names(table(dati$hc))
+  
+  return(output)
+  
+}
+
+appartenenza <- clusterizzazione(dati$hc)
+appartenenza <- as.matrix(appartenenza)
+
+# set df as matrix
+dati <- as.matrix(dati)
+
+# find within/between variance and pseudof
+calcolo_f <- function(nome_var){
+  col_dati <- grep(paste("^",nome_var,"$", sep=""), colnames(dati))
+  col_medie <- grep(paste("^",nome_var,"$", sep=""), colnames(medie_clusters))
+  
+  w_variance <- sum(diag(t(dati[, col_dati] - appartenenza %*% medie_clusters[, col_medie]) %*%
+                             (dati[, col_dati] - appartenenza %*% medie_clusters[, col_medie])))
+  
+  b_variance <- sum(diag(t(appartenenza %*% medie_clusters[, col_medie]) %*% (appartenenza %*% medie_clusters[, col_medie])))
+  
+  F <- (b_variance/(k-1))/(w_variance/(n-k))
+  
+  values <- list("WSS" = w_variance, "GSS" = b_variance, "PseudoF" = F)
+  
+  return(values)
+  
+}
+
+# summarize
+confronto_vars <- matrix(NA, nrow = 8, ncol = 3)
+
+for(i in 1:8){
+  nome <- colnames(dati)[i+4]
+  confronto_vars[i, 1] = calcolo_f(nome)$WSS
+  confronto_vars[i, 2] = calcolo_f(nome)$GSS
+  confronto_vars[i, 3] = calcolo_f(nome)$PseudoF
+}
+
+row.names(confronto_vars) <- c("superficie", "altezza_acqua", "distanza_secchia",
+                            "dislivello", "area", "edfc", "valore_immobile", 
+                            "danno_relativo")
+colnames(confronto_vars) <- c("WSS", "BSS", "PseudoF")
+
+confronto_vars <- round(confronto_vars, 2)
