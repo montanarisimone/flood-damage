@@ -155,3 +155,5 @@ row.names(confronto_vars) <- c("superficie", "altezza_acqua", "distanza_secchia"
 colnames(confronto_vars) <- c("WSS", "BSS", "PseudoF")
 
 confronto_vars <- round(confronto_vars, 2)
+
+# CLUSTERS MAPPED IN GIS
