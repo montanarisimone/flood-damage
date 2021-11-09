@@ -12,11 +12,13 @@ Furthermore we tried to implement a statistical model to gain a forecast estimat
 
 Useful links:
 
-https://www.provincia.modena.it/news/rottura-dellargine-del-fiume-secchia/
+https://www.provincia.modena.it/news/rottura-dellargine-del-fiume-secchia
 
-https://www.ilpost.it/2014/01/21/foto-alluvione-modena/
+https://www.ilpost.it/2014/01/21/foto-alluvione-modena
 
-https://www.ilpost.it/2014/01/27/alluvione-modenese-danni/
+https://www.ilpost.it/2014/01/27/alluvione-modenese-danni
+
+https://www.lodeproject.polimi.it/modena-flood-showcase
 
 <br />
 
