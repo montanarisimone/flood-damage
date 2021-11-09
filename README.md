@@ -20,6 +20,6 @@ https://www.ilpost.it/2014/01/27/alluvione-modenese-danni/
 
 <br />
 
-*I'm not an expert, I'm a student and newbie in ML world. If yout have comments or suggestions, feel free to ping me*
+*I'm not an expert, I'm a student and newbie in ML world. If you have comments or suggestions, feel free to ping me*
 
 *Contact me to read the finished work*
