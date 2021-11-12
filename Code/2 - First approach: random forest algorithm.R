@@ -5,9 +5,9 @@ library("reprtree")
 library("inTrees")
 
 data_rf <- subset(dati_cat, select = -c(id, outlier, danno_beni_immobili,
-                                     costo_medio,
-                                     danno_relativo_costo))
-                                     
+                                        costo_medio,
+                                        danno_relativo_costo))
+
 data_rf$tipologia_strutturale <- as.factor(data_rf$tipologia_strutturale)
 
 # train test split
@@ -49,7 +49,7 @@ ntrees <- seq(200, 600, by=100)
 nodesize <- seq(4, 20, by = 4)
 params <- expand.grid(ntrees = ntrees,
                       nodesize = nodesize)
-                      
+
 store_maxnode <- vector("list", nrow(params))
 pb <- txtProgressBar(min = 0, max = nrow(params), style = 3) # progress bar
 
@@ -74,7 +74,7 @@ for(i in 1:nrow(params)){
 # rename resulting list with corresponding parameters
 names(store_maxnode) <- paste("ntrees:", params$ntrees,
                               "nodesize:", params$nodesize)
-                              
+
 # combine results
 results_mtry <- resamples(store_maxnode)
 
@@ -106,35 +106,35 @@ test_performance_tuned <- postResample(pred = pred_test_tuned_rf, obs = data_tes
 print(round(test_performance_tuned, 2))
 
 ## VAR IMPORTANCE
-imp <- as.data.frame(varImp(rf_tuned))
-imp <- data.frame(names   = rownames(imp),
-                  overall = imp$Overall)
-imp <- imp[order(imp$overall, decreasing = T),] 
-for(i in 1:nrow(imp)){
-  if(grepl("_", imp$names[i], fixed=T)){ # cerca _ nella stringa
-    imp$name[i] <- strsplit(imp$names[i], "_")[[1]][[1]] # prende la parte prima di _
-  }else{imp$name[i] = imp$names[i]}
+imp_rf <- as.data.frame(varImp(rf_tuned))
+imp_rf <- data.frame(names   = rownames(imp_rf),
+                  overall = imp_rf$Overall)
+imp_rf <- imp_rf[order(imp_rf$overall, decreasing = T),] 
+for(i in 1:nrow(imp_rf)){
+  if(grepl("_", imp_rf$names[i], fixed=T)){ # cerca _ nella stringa
+    imp_rf$name[i] <- strsplit(imp_rf$names[i], "_")[[1]][[1]] # prende la parte prima di _
+  }else{imp_rf$name[i] = imp_rf$names[i]}
 }
 # plot var importance
-barplot(height=imp$overall, names=imp$name, 
+barplot(height=imp_rf$overall, names=imp_rf$name, 
         col="#69b3a2",
         las=1)
 title("RF Variable Importance", adj = 0)
-imp_t <- imp[, 2:3]
-colnames(imp_t) <- c("RF", "var")
+imp_rf1 <- imp_rf[, 2:3]
+colnames(imp_rf1) <- c("RF", "var")
 
 # scaled var importance
 scaling <- function(x) {
   out = (x - min(x))/(max(x) -  min(x))
 }
-barplot(height = scaling(imp$overall), names = imp$name, 
+barplot(height = scaling(imp_rf$overall), names = imp_rf$name, 
         col="#69b3a2", ylab = "importanza scalata",
         las=1)
 title("RF Variable Importance", adj = 0)
 
 ## RF MODEL RULES
-ruleExec0 <- extractRules(RF2List(rf_tuned), data_train_rf[,-ncol(data_train_rf)], ntree = 300)
-ruleExec <- unique(ruleExec0)
-ruleMetric <- getRuleMetric(ruleExec, data_train_rf[,-ncol(data_train_rf)], data_train_rf[,ncol(data_train_rf)])
-rules <- presentRules(ruleMetric, colnames(data_train_rf))
-rules <- rules[order(rules[,"freq"], decreasing = T), ]
+ruleExec0_rf <- extractRules(RF2List(rf_tuned), data_train_rf[,-ncol(data_train_rf)], ntree = 300)
+ruleExec_rf <- unique(ruleExec0_rf)
+ruleMetric_rf <- getRuleMetric(ruleExec_rf, data_train_rf[,-ncol(data_train_rf)], data_train_rf[,ncol(data_train_rf)])
+rules_rf <- presentRules(ruleMetric_rf, colnames(data_train_rf))
+rules_rf <- rules_rf[order(rules_rf[,"freq"], decreasing = T), ]
