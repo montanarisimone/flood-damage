@@ -4,9 +4,9 @@ library("caret")
 library("inTrees")
 
 data_xgb <- subset(dati_bin, select = -c(id, outlier, danno_beni_immobili,
-                                     costo_medio,
-                                     danno_relativo_costo))
-                                     
+                                         costo_medio,
+                                         danno_relativo_costo))
+
 # train test split
 set.seed(123)
 index <- sample(1:nrow(data_xgb), round(0.85*nrow(data_xgb)), replace = F)
@@ -28,14 +28,14 @@ parameters <- list(eta = 0.3,
                    eval_metric = "rmse",
                    objective = "reg:squarederror",
                    booster = "gbtree")
-                   
+
 set.seed(123)
 model <- xgboost(data = train.X,
                  label = train.y,
                  nrounds = 300, 
                  params = parameters,
                  print_every_n = 50)
-                 
+
 # predict on train and test data
 pred_test <- predict(model, newdata = test.X)
 pred_train <- predict(model, newdata = train.X)
@@ -115,18 +115,18 @@ round(postResample(pred = pred_train1, obs = train.y), 2)
 round(postResample(pred = pred_test1, obs = test.y), 2)
 
 ### VARIABLE IMPORTANCE
-imp4 <- as.data.frame(xgb.importance(model = model1))
-imp4 <- data.frame(names   = imp4$Feature,
-                   gain = imp4$Gain)
-imp4 <- imp4[order(imp4$gain, decreasing = T),] 
-for(i in 1:nrow(imp4)){
-  if(grepl("_", imp4$names[i], fixed=T)){ 
-    imp4$name[i] <- strsplit(imp4$names[i], "_")[[1]][[1]] 
-  }else{imp4$name[i] = imp4$names[i]}
+imp_xgb <- as.data.frame(xgb.importance(model = model1))
+imp_xgb <- data.frame(names   = imp_xgb$Feature,
+                   gain = imp_xgb$Gain)
+imp_xgb <- imp_xgb[order(imp_xgb$gain, decreasing = T),] 
+for(i in 1:nrow(imp_xgb)){
+  if(grepl("_", imp_xgb$names[i], fixed=T)){ 
+    imp_xgb$name[i] <- strsplit(imp_xgb$names[i], "_")[[1]][[1]] 
+  }else{imp_xgb$name[i] = imp_xgb$names[i]}
 }
 
 # plot vars importance
-barplot(height=imp4$gain, names=imp4$name, 
+barplot(height=imp_xgb$gain, names=imp_xgb$name, 
         col="orange",
         las=1, horiz = F, ylim = c(0,0.27))
 title("XGB Variable Importance", adj = 0)
@@ -135,15 +135,15 @@ title("XGB Variable Importance", adj = 0)
 scaling<- function(x){
   out=(x-min(x))/(max(x)-min(x))
 }
-barplot(height = scaling(imp4$gain), names = imp4$name, 
+barplot(height = scaling(imp_xgb$gain), names = imp_xgb$name, 
         col="orange", ylab = "importanza scalata",
         las=1, horiz = F)
 title("XGB Variable Importance", adj = 0)
 
 ### RULES
 tree_list <- XGB2List(model1, train.X)
-ruleExec0 <- extractRules(treeList = tree_list, X = train.X, random = F)
-ruleExec <- unique(ruleExec0)
-ruleMetric <- getRuleMetric(ruleExec, data_train_xgb[,-ncol(data_train_xgb)], data_train_xgb[,ncol(data_train_xgb)])
-rules <- presentRules(ruleMetric, colnames(data_train_xgb))
-rules <- rules[order(rules[,"freq"], decreasing = T), ]
+ruleExec0_xgb <- extractRules(treeList = tree_list, X = train.X, random = F)
+ruleExec_xgb <- unique(ruleExec0_xgb)
+ruleMetric_xgb <- getRuleMetric(ruleExec_xgb, data_train_xgb[,-ncol(data_train_xgb)], data_train_xgb[,ncol(data_train_xgb)])
+rules_xgb <- presentRules(ruleMetric_xgb, colnames(data_train_xgb))
+rules_xgb <- rules_xgb[order_xgb(rules[,"freq"], decreasing = T), ]
