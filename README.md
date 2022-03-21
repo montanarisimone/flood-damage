@@ -2,7 +2,7 @@
 
 ![ALLUVIONE-BOMPORTO-2014](https://user-images.githubusercontent.com/40363581/140780540-9709c068-776c-45c6-9085-7ad6af6638d2.jpg)
 
-R code used in the thesis project about flood damage in municipalities of Bomporto and Bastiglia in 2014.
+R code used in the BSc thesis project about flood damage in municipalities of Bomporto and Bastiglia in 2014.
 
 This project has been developed in partnership with Italian Red Cross and the Laboratory of Risk Analysis and Emergency Management of CNR-IGAG (https://www.igag.cnr.it/).
 
