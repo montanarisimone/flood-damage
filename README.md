@@ -4,7 +4,7 @@
 
 R code used in the thesis project about flood damage in municipalities of Bomporto and Bastiglia in 2014.
 
-This project has been developed in partnership with the Laboratory of Risk Analysis and Emergency Management of CNR-IGAG (https://www.igag.cnr.it/).
+This project has been developed in partnership with Italian Red Cross and the Laboratory of Risk Analysis and Emergency Management of CNR-IGAG (https://www.igag.cnr.it/).
 
 The goal of this work is to analyze the flood damage registered on private buildings looking for the relationships of the dameges with topographic and structural elements.
 Furthermore we tried to implement a statistical model to gain a forecast estimate of these damages.
