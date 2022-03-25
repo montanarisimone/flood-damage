@@ -9,6 +9,7 @@ This project has been developed in partnership with Italian Red Cross and the La
 The goal of this work is to analyze the flood damage registered on private buildings looking for the relationships of the dameges with topographic and structural elements.
 Furthermore we tried to implement a statistical model to gain a forecast estimate of these damages.
 
+This is the first step in trying to improve this study field.
 
 Useful links:
 
@@ -22,6 +23,6 @@ https://www.lodeproject.polimi.it/modena-flood-showcase
 
 <br />
 
-*I'm not an expert, I'm a student and newbie in ML world. If you have comments or suggestions, feel free to ping me*
+*I'm not an expert, I'm a student and newbie in ML world. If you have any comments or suggestions, feel free to ping me*
 
-*Contact me to read the finished work*
+*Contact me to read the whole work*
