@@ -1,0 +1,1298 @@
+% Anteprima del sorgente
+
+%% LyX 2.3.6.1 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[oneside, noexaminfo, italian]{sapthesis}
+\usepackage[LGR,T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{verbatim}
+\usepackage{float}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{stackrel}
+\usepackage{graphicx}
+\usepackage[unicode=true]
+ {hyperref}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\DeclareRobustCommand{\greektext}{%
+  \fontencoding{LGR}\selectfont\def\encodingdefault{LGR}}
+\DeclareRobustCommand{\textgreek}[1]{\leavevmode{\greektext #1}}
+\ProvideTextCommand{\~}{LGR}[1]{\char126#1}
+
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}
+\providecommand{\algorithmname}{Algoritmo}
+\floatname{algorithm}{\protect\algorithmname}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\usepackage[italian]{babel}
+\author{Montanari Simone}
+\IDnumber{1642957}
+\course{Corso di Laurea in Statistica Gestionale}
+\courseorganizer{Facoltà di Ingegneria dell'Informazione, Informatica e Statistica}
+\AcademicYear{2020/2021}
+\advisor{Prof. Maurizio Vichi}
+\coadvisor{Dr. Christian Natale Gencarelli} \coadvisor{Dr. Simone Sterlacchini}
+\customcoadvisorlabel{Relatori Esterni}
+
+\copyyear{2022}
+\authoremail{simonemontanar@gmail.com}
+\usepackage{caption}
+\captionsetup{singlelinecheck=off}
+\captionsetup{justification=raggedright}
+\usepackage{graphicx}
+\usepackage{subfig}
+
+\makeatother
+
+\begin{document}
+\title{Valutazione del danno alluvionale mediante strumenti di Statistica
+Multivariata e Machine Learning}
+
+\maketitle
+\dedication{To me}
+
+\begin{abstract}
+\thispagestyle{empty}
+Il presente progetto nasce da una collaborazione tra il Consiglio Nazionale delle Ricerche (C.N.R.) e Croce Rossa Italiana (C.R.I.).
+
+Più precisamente, il lavoro è stato svolto sotto la supervisione del Laboratorio di Analisi dei Rischi e di Gestione delle Emergenze (\href{https://www.igag.cnr.it/lista-laboratori/large-laboratorio-di-analisi-dei-rischi-e-di-gestione-delle-emergenze/}{LARGE}) dell'Istituto di Geologia Ambientale e Geoingegneria (\href{https://www.igag.cnr.it/}{IGAG}) del CNR di Milano, il cui compito è studiare e comprendere i processi geologici e naturali e le attività antropiche che interagiscono con l'ambiente, le attività e la vita dell'uomo.
+
+Lo studio effettuato riguarda in particolare il fenomeno alluvionale che colpì, in data 19 gennaio 2014, i comuni di Bomporto e Bastiglia nella provincia di Modena, provocando ingenti danni a seguito della rottura degli argini del fiume Secchia, a nord dei suddetti comuni.
+
+Lo scopo di questo lavoro è principalmente testare algoritmi di apprendimento (non) supervisionato al fine di rendere più efficienti le analisi di fenomeni simili, capendo quali caratteristiche (naturali e/o antropiche) incidono maggiormente sugli stessi e migliorare così la prevenzione e la risposta di simili eventi futuri.
+
+Ad oggi esistono ancora pochi studi simili e, poichè si tratta di un fenomeno strettamente locale, non è possibile applicare metodologie sviluppate altrove ottenendo risultati soddisfacenti. 
+
+A tal proposito, è stato utilizzato come riferimento principale il lavoro svolto da Carisi et al. e pubblicato nel 2017.
+
+Questo lavoro è stato presentato nella Sessione 4 del XV Convegno Nazionale GIT tenutosi il 20 e 21 Dicembre 2021 presso Ripatransone (AP).
+
+Per le analisi è stato utilizzato solamente il linguaggio di programmazione R. Gran parte dello script è visionabile alla pagina github \href{https://github.com/montanarisimone/flood-damage}{montanarisimone/flood-damage}.
+
+\end{abstract}
+
+\tableofcontents{}
+
+\thispagestyle{empty}
+
+\chapter{Introduzione}
+
+\setcounter{page}{1}
+
+\section{Il fenomeno alluvionale in Italia}
+
+dsadsdsa
+
+\chapter{Materiali e Metodi}
+
+In questa sezione sono presentati e descritti gli algoritmi e le principali
+analisi statistiche adottate nelle varie fasi dello studio. Saranno
+presenti anche rappresentazioni grafiche come supporto per una più
+chiara comprensione di quanto descritto.
+
+\section{La Pulizia dei Dati}
+
+In ogni lavoro statistico, la fase più importante è la pulizia e la
+correzione dei dati in quanto da questa deriva la bontà dei risultati
+finali delle analisi.
+
+Elementi principali di questa fase sono la correzione ortografica
+e semantica dei dati, la gestione dei valori mancanti e di quelli
+anomali. 
+
+La prima può essere evitata con un'efficace raccolta dei dati seguita
+da una adeguata gestione di quest'ultimi. 
+
+Le altre sono affrontate brevemente di seguito.
+
+\subsection{Valori Mancanti}
+
+I valori mancanti (\emph{missing values} o \emph{NA values} in inglese)
+sono un problema ricorrente in qualsiasi tipo di analisi e, nonostante
+le attenzioni che si possono prendere in fase di raccolta dei dati,
+è difficile prevenire questo fenomeno. Ci sono, però, vari metodi
+per trattarli.
+
+Seguirà una breve trattazione a scopo informativo. Per una discussione
+più approfondita si rimanda a testi più specifici, quali, ad esempio,
+Graham \& Hofer (2000), Graham et al. (2003), Graham et al. (2013).
+
+Anzitutto è bene specificare che esistono due scenari possibili di
+non risposta: mancata risposta totale o parziale.
+
+È inoltre sempre utile chiedersi cosa si nasconda dietro la mancata
+risposta. 
+
+Graham et al. (2003) scrivono che i dati mancanti sono causati da
+una combinazione di tre elementi: fattori casuali, fenomeni misurati
+e fenomeni non misurati \cite{graham}. 
+
+A questa descrizione si aggiunge quella relativa al meccanismo di
+non risposta elaborata da Little \& Rubin, (1987). I due statistici
+fanno ricadere quest'ultimo in una delle seguenti tre categorie \cite{rubin-little}:
+\begin{enumerate}
+\item \emph{Missing Completely at Random} (MCAR): il meccanismo di non risposta
+è indipendente dalle variabili rilevate e si possono quindi assumere
+come dati casualmente mancanti. In questo caso si eliminano le non
+risposte senza rischiare di incorrere in qualche bias. Conseguentemente
+ci sarà una ridotta potenza nelle analisi che si andranno a svolgere
+successivamente;
+\item \emph{Missing at Random} (MAR): in questo caso la mancanza di dati
+è dovuto alle variabili osservate che riportano dati mancanti. Il
+meccanismo di risposta è ancora ignorabile se nelle analisi si tiene
+conto dei fattori che hanno causato la mancanza;
+\item \emph{Not Missing at Random} (NMAR): il meccanismo dipende da fattori
+non analizzati dal ricercatore. Questo è il caso più complicato, e
+la soluzione migliore risiede nel cercare di avvicinarsi al sistema
+MAR tramite la costruzione di un modello che tenga in considerazione
+più variabili possibili.
+\end{enumerate}
+Una volta capita la natura del meccanismo di non risposta, si può
+procedere con il trattamento dei dati mancanti. Esistono tre principali
+strategie:
+\begin{itemize}
+\item Complete-Case Analysis: si escludono dal dataset tutti i dati mancanti;
+\item Imputazione Semplice: se una sola variabile presenta dati mancanti,
+questi possono essere imputati. In questo caso ci sono varie tecniche,
+le più famose sono l'uso della regressione e la sostituzione dei valori
+mancanti con il valore medio o mediano. Ciascuno dei due sistemi ha
+pro e contro quindi la strategia da adottare va scelta in base al
+singolo problema;
+\item Imputazione Multipla: come l'imputazione semplice ma estesa ad altre
+variabili.
+\end{itemize}
+Per approfondire gli aspetti teorici e pratici, si rimanda ai testi
+in bibliografia \cite{wayman,cameron,soley}.
+
+\subsection{\label{subsec:Valori-Anomali}Valori Anomali}
+
+La definizione di cosa sia un valore anomalo (\emph{outlier} in inglese)
+non è univoca. Nel 1969 F. Grubbs descriveva un outlier come una \emph{\textit{<<}osservazione
+che sembra discostarsi di molto dagli altri valori della popolazione>>
+}\cite{grubbs}. D. Hawkins nel 1980 amplia questa definizione introducendo
+il meccanismo di generazione dei dati: \textit{<<un outlier è un'osservazione che si discosta così tanto dalle altre osservazioni da destare il sospetto che sia stata generata da un diverso meccanismo>>}\cite{hawkins}.
+Questa formulazione ha quindi una base prettamente statistica, assumendo
+che i dati ``normali'' siano frutto di un meccanismo, ad esempio
+un preciso processo statistico, mentre i valori anomali deviano da
+tale meccanismo di generazione.
+
+Nel 1994 Barnett \& Lewis riassumono queste definizioni affermando
+che un valore anomalo è \textit{<<un'osservazione che sembra essere incoerente con il resto di quella serie di dati>>}
+\cite{barnett}.
+
+Anche questo, come i valori mancanti, è un problema molto frequente,
+ed è quindi necessario trattarlo con consapevolezza.
+
+Ovviamente ci sono casi in cui avere degli outlier è fondamentale
+per fare delle analisi specifiche su questi. Si pensi ad esempio al
+rilevamento delle frodi dove, tra tante transazioni corrette, bisogna
+individuare quelle anomale. O anche alle applicazioni in campo sanitario,
+in cui sintomi insoliti possono indicare potenziali rischi di salute
+per il paziente. O, ancora, nello sport, dove vengono registrate le
+performance degli atleti e tramite gli outlier si possono individuare
+quelli più promettenti.
+
+Normalmente, però, questi valori anomali non sono l'oggetto principale
+dell'analisi (si consiglia comunque di dedicare parte dello studio
+a questi valori, potrebbero rivelare sotto-fenomeni interessanti).
+
+Ben-Gal evidenzia come i metodi per rilevare gli outlier si dividono
+in \emph{univariati} e \emph{multivariati }\cite{bengal}, a seconda
+che si vogliano trovare i valori anomali di una singola variabile
+o di più variabili contemporaneamente (outlier univariati non necessariamente
+lo sono anche in uno spazio n-dimensionale, e viceversa). 
+
+Seguiranno ora alcuni accenni ai metodi di rilevazione dei valori
+anomali. Per maggiori dettagli si rimanda a \emph{Outliers in statistical
+data}, Barnett \& Lewis (1994), \emph{Methods for Statistical Data
+Analysis of Multivariate Observations}, Gnanadesikan (1997), \emph{Applied
+multivariate statistical analysis}, Johnson \& Wichern (2007).
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.2]{boxplot_generale}
+\caption{\emph{Boxplot (\protect\href{https://www.kdnuggets.com/2019/11/understanding-boxplots.html}{Fonte})}}
+\label{fig:boxplot_esemplificativo}
+\end{figure}
+
+Nel caso si fosse interessati a outlier univariati, il metodo ad oggi
+più diffuso per individuarli prevede l'uso del \emph{range interquantilico}
+e di un \emph{boxplot} come supporto.
+
+A titolo esemplificativo esaminiamo il \emph{boxplot }in Figura \ref{fig:boxplot_esemplificativo}.
+
+La figura è molto chiara. In rosa viene evidenziato il \emph{range
+interquartile} calcolato come $\mathcal{IQR}=Q3-Q1$, con $Q1$ e
+$Q3$ rispettivamente primo e terzo \emph{quartile}. Per selezionare
+i dati outlier è definito un nuovo range, in violetto, il cui limite
+inferiore e superiore è dato da, rispettivamente, $LI=Q1-1.5*IQR$
+e $LS=Q3+1.5*IQR$\footnote{Per approfondire la formula, si consiglia di iniziare da questo articolo
+\url{https://towardsdatascience.com/why-1-5-in-iqr-method-of-outlier-detection-5d07fdc82097}}. Tutti i valori esterni a questo range sono considerati anomali.
+
+Altri due metodi diffusi ma meno usati sono il cosidetto \emph{z-score}
+e i test d'ipotesi.
+
+Mentre il procedimento univariato è piuttosto intuitivo e standardizzato,
+nel caso multivariato la situazione è più complicata e richiede maggiori
+attenzioni. La complessità risiede nella scelta dell'algoritmo da
+utilizzare in quanto si possono ottenere output molto diversi. Questi
+alcuni dei metodi maggiormente utilizzati (rappresentati in Figura
+\ref{fig:anomali}):
+
+\begin{figure}
+\centering
+\subfloat[][\emph{Isolation Forest (\protect\href{https://machinelearninggeek.com/outlier-detection-using-isolation-forests/}{Fonte})}]
+	{\includegraphics[height=0.17\textheight]{isolation forest}} \\
+\subfloat[][\emph{LOF (\protect\href{https://arxiv.org/pdf/1902.00567.pdf}{Fonte})}]
+	{\includegraphics[height=0.15\textheight]{lof}} \qquad
+\subfloat[][\emph{DBSCAN (\protect\href{https://en.wikipedia.org/wiki/DBSCAN}{Fonte})}]
+	{\includegraphics[height=0.15\textheight]{dbscan}} \qquad
+\subfloat[][\emph{Mahalanobis (\protect\href{https://medium.com/dive-into-ml-ai/faster-implementation-of-mahalanobis-distance-using-tensorflow-42f7aa586bac}{Fonte})}]
+	{\includegraphics[height=0.15\textheight]{mahalanobis}}
+\caption{Valori anomali multivariati}
+\label{fig:anomali}
+\end{figure}
+\begin{itemize}
+\item \emph{Isolation Forest}: metodo \emph{ensemble} derivante dall'algoritmo
+\emph{Random Forest} e basato, quindi, su alberi di decisione.Viene
+prima scelta casualmente una variabile e poi selezionato un valore
+casuale, compreso tra il valore minimo e massimo della caratteristica
+scelta, per iniziare a suddividere le osservazioni. Il processo continua
+finchè non viene isolata ogni singola unità o non è raggiunta una
+specifica profondità. Gli outlier sono meno frequenti e con valori
+lontani dalle osservazioni regolari. A tutte le foglie viene assegnato
+un punteggio, calcolato come $s(x,n)=2^{-\frac{E(h(x))}{c(n)}}$,
+in base al quale si può affermare se quel valore è anomalo o meno
+\cite{isolation forest};
+\item \emph{Local Outlier Factor}: fissato un valore \emph{k}, l'algoritmo
+analizza la densità di ciascuna unità rispetto ai \emph{k }punti più
+vicini e assegna così un punteggio all'osservazione esaminata. Basandosi
+sulla densità, più aumenta la distanza dai \emph{k} vicini, più aumenta
+l'area intorno al punto in esame, più sono radi i punti all'interno
+dell'area. Un valore\emph{ LOF} alto ($LOF\gg1$) indica quindi che
+la densità del punto è bassa mentre quella dei \emph{k }vicini è alta
+(e quindi questi \emph{k} vicini sono poco distanti tra loro) e pertanto
+può essere considerato un outlier \cite{lof}. Esistono anche delle
+sue varianti ma il procedimento logico alla base rimane il medesimo;
+\item \emph{DBSCAN}: è un classico algoritmo di clustering. Seleziona casualmente
+un punto non appartenente ad alcun cluster e determina se è un punto
+centrale di un possibile nuovo cluster controllando se ci sono almeno
+\emph{n }punti entro una distanza pari a \textgreek{e}. Se intorno
+a questi esistono altri punti a una distanza \textgreek{e}, vengono
+aggiunti al cluster. In questo modo rimangono isolate quelle osservazioni
+che hanno intorno un numero di unità inferiore a \emph{n}. Questi
+sono considerati oulier \cite{dbscan1,dbscan2,dbscan3};
+\item \emph{Distanza di Mahalanobis}: individua gli outlier osservando la
+distribuzione dei dati. È molto utilizzata in quanto, facendo uso
+della matrice delle covarianze, restituisce buoni risultati quando
+le variabili sono molto correlate e/o hanno differenti scale di misurazione.
+Viene calcolata la distanza tra un punto e il centro della distribuzione
+(si considera la media), dopodichè vengono considerati anomali tutti
+i valori al di fuori dell'ellisse avente raggio pari a $\sqrt{\chi_{p,0.95}^{2}}$
+o $\sqrt{\chi_{p,0.99}^{2}}$ . La distanza è calcolata, per un dataset
+$n\times p$, come $MD_{i}:=((x_{i}-t)^{'}C^{-1}(x_{i}-t))^{1/2}$
+per $i=1,..,n$, dove $t$ è il vettore delle medie e $C$ la matrice
+di varianze e covarianze \cite{bengal,geochemistry,mahalanobis1,mahalanobis2}.\newline
+\end{itemize}
+Una volta completata la pulizia dei dati, si iniziano a visionare
+più nel dettaglio i dati raccolti.
+
+Generalmente è utile iniziare applicando le analisi appartenenti alla
+statistica descrittiva e quindi individuare la distribuzione dei dati
+tramite grafici, indici di misura e variabilità, nonchè indici di
+relazione tra le variabili.
+
+Così facendo, si riesce ad avere una prima idea del fenomeno oggetto
+di studio, individuarne eventuali peculiarità e selezionare le analisi
+più adeguate allo stesso.
+
+Per sviluppare questo progetto si è fatto ricorso principalmente ad
+algoritmi di \emph{machine learning}, seguendo le orme dei lavori
+precedenti \cite{Carisi,flood1,flood2}. 
+
+Ad oggi esistono tre categorie di algoritmi di machine learning: ad
+apprendimento supervisionato, ad apprendimento non supervisionato,
+ad apprendimento per rinforzo.
+
+Sarà data una breve descrizione di tutte e tre le tipologie, approfondendo
+le particolarità utili a comprendere al meglio il lavoro descritto
+in questo testo.
+
+Per un'introduzione a questi algoritmi e, più in generale, al machine
+learning, si consiglia la lettura dei testi utilizzati per portare
+a termine questo lavoro, più precisamente i libri \cite{Statistical Learning,introduction SL,hands on - python}.
+
+\section{Apprendimento Supervisionato}
+
+Data una matrice di dati $n\times m$ ($n$ osservazioni, $m$ variabili),
+definiamo con $X_{i}$, $i=1..m-1$, le variabili di \emph{input}.
+Sia $Y$, quindi, la \emph{m}-esima variabile, detta \emph{output}.
+Le prime influenzano in qualche modo la seconda e lo scopo dell'apprendimento
+supervisionato è usare gli \emph{input} per predire il valore dell'\emph{output}. 
+
+Utilizzando una terminologia statistica, gli \emph{input} sono detti
+\emph{predittori} o \emph{variabili indipendenti. }Spesso viene utilizzato
+anche il termine \emph{features.}
+
+L'\emph{output}, invece, è chiamato \emph{risposta} o \emph{variabile
+dipendente}.
+
+Un algoritmo che opera su un dataset così fatto è detto di \emph{apprendimento
+supervisionato }(in inglese \emph{supervised learning}) in quanto
+il suo scopo è imparare dagli input e output dati (fase di addestramento
+o \emph{training}) e creare un modello predittivo con cui, dati dei
+nuovi input, ottenere un output non osservato. In una forma elementare,
+un algoritmo di apprendimento supervisionato può essere scritto come 
+
+\begin{equation}
+y=f(x_{1},..,x_{n}).\label{eq:algoritmo}
+\end{equation}
+
+Al fine di ottenere un modello performante anche con nuovi dati, il
+dataset iniziale viene suddiviso in, almeno, due parti, chiamate \emph{training
+set} e \emph{test} \emph{set}. 
+
+La prima, in cui ricadono, di solito, l'$80\%$ delle osservazioni,
+ha lo scopo di allenare l'algoritmo più volte tramite, anche, la tecnica
+della \emph{cross-validation} così da renderlo teoricamente robusto
+a nuovi input. È in questa fase che viene generata la funzione $f$
+dell'equazione \ref{eq:algoritmo}. Una volta ``allenato'', viene
+testato sul dataset di test che, per come è creato, contiene dati
+nuovi per l'algoritmo. 
+
+Utilizzando quindi delle misure di performance, si riesce a trovare
+il modello più adatto al problema.
+
+In base alla natura della variabile dipendente, questi algoritmi possono
+essere suddivisi in due sottocategorie:
+\begin{itemize}
+\item Classificazione: $y$ è una variabile \emph{qualitativa} (o, equivalentemente,
+\emph{categorica}) quindi l'algoritmo dovrà assegnare i nuovi input
+a delle classi. Gli algoritmi di classificazione più popolari sono
+(tra parentesi la dicitura inglese):
+\begin{itemize}
+\item Regressione Logistica (\emph{logistic regression})
+\item Macchine a Vettori di Supporto (\emph{support vector machine})
+\item Classificatore Naïve Bayes (\emph{Naïve Bayes classifier})
+\item Alberi Decisionali (\emph{decision trees})
+\item Foresta Casuale (\emph{random forest})
+\item Reti Neurali (\emph{neural networks})
+\end{itemize}
+\item Regressione: $y$ è una variabile \emph{quantitativa} quindi l'output
+sarà un valore numerico. Gli algoritmi più popolari sono:
+\begin{itemize}
+\item Regressione Lineare (\emph{linear regression})
+\item Alberi Decisionali (\emph{decision trees})
+\item Foresta Casuale (\emph{random forests})
+\item Alberi Decisionali Potenziati (\emph{boosted decision trees})
+\end{itemize}
+\end{itemize}
+Nonostante l'argomento sia molto interessante da sviscerare, l'approfondimento
+di questi algoritmi esula dall'obiettivo di questo testo, pertanto,
+nelle prossime sezioni, saranno affrontati solamente i modelli utilizzati.
+Si anticipa che il caso studio rientra nella sottocategoria della
+regressione. 
+
+\subsection{Alberi Decisionali}
+
+I modelli di regressione lineare falliscono nel caso in cui la relazione
+tra input e output non è lineare o esiste una correlazione tra le
+variabili. In questi casi un primo approccio all'analisi dei dati
+avviene attraverso gli \emph{alberi decisionali}.
+
+Questi modelli partizionano lo spazio delle variabili in sottoisiemi
+sempre più piccoli fissando, di volta in volta, dei valori di \emph{cutoff.}
+In questo modo ogni istanza apparterrà a uno e uno solo di questi
+sottoinsiemi.
+
+Si ottiene così una rappresentazione che ricorda un albero e, per
+questo, il sottogruppo in cima è detto \emph{nodo radice}, i sottoinsiemi
+finali sono detti \emph{nodi terminali}, o \emph{foglie}, mentre i
+sottoinsiemi intermedi sono chiamati \emph{nodi interni}. Le connessioni
+trai nodi sono chiamate \emph{rami}. 
+
+Esistono vari meccanismi di generazione dell'albero ma il più diffuso
+è il cosidetto \emph{Classification And Regression Trees }(\emph{CART}),
+proposto da Breiman \cite{cart}.
+
+\subsubsection*{Partizionamento}
+
+Un albero decisionale, quindi, divide iterativamente i dati di training
+in sottogruppi fino a ottenere le foglie, a cui assegna una costante
+(di solito la media degli output appartententi a quel nodo).
+
+Questa suddivisione segue una partizione binaria creata mettendo in
+relazione le modalità delle variabili osservate e il cutoff. L'algoritmo
+continua finchè non viene soddisfatto il criterio d'arresto scelto
+(ad esempio, è raggiunta la profondità massima). 
+
+Completata la divisione, l'output prodotto dal modello è basato sui
+valori medi delle modalità espresse dalle osservazioni che ricadono
+in quel sottogruppo.
+
+Per una migliore comprensione si veda la Figura \ref{fig:Albero_decisionale}.
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.4]{decision}
+\caption{\emph{Albero Decisionale (\protect\href{https://dinhanhthi.com/decision-tree-regression/}{Fonte})}}
+\label{fig:Albero_decisionale}
+\end{figure}
+
+La funzione che descrive la relazione tra l'output $y$ e le variabili
+$x$ è la seguente: 
+\begin{equation}
+\hat{y}=\hat{f}(x)=\stackrel[g=1]{G}{\sum}c_{g}I_{\{x\in R_{g}\}}.
+\end{equation}
+
+È chiaro come ogni record appartiene esattamente a una foglia (corrispondente
+al sottoinsieme $R_{g}$). $I_{\{x\in R_{g}\}}$ è la funzione d'identità
+che vale 1 se $x\in R_{g}$ e 0 altrimenti, mentre $c_{g}$ è la costante.
+
+L'obiettivo di ogni nodo è trovare la variabile migliore $x_{i}$
+con cui partizionare i restanti dati in due regioni, $R_{1}$e $R_{2}$,
+in modo da minimizzare l'errore tra la variabile risposta osservata
+$y_{i}$ e il valore predetto per quella regione, $c_{i}$.
+
+Nel caso della regressione, la minimizzazione riguarda il totale delle
+somme dei quadrati degli errori (\emph{SSE}) ed è definita come:
+
+\begin{equation}
+SSE=\underset{i\in R_{1}}{\sum}(y_{i}-c_{1})^{2}+\underset{i\in R_{2}}{\sum}(y_{i}-c_{2})^{2}
+\end{equation}
+
+Questa tipologia di partizionamento si ripete, come accennato poco
+sopra, su ogni nuova regione fino a quando non viene raggiunta una
+regola di arresto. È importante sottolineare che una singola variabile
+può essere utilizzata più volte per suddividere i dati se risulta
+essere quella che restituisce la partizione migliore.
+
+\subsubsection*{Profondità}
+
+Da quanto detto finora, si può intuire che questo tipo di alberi possono
+essere formati da un elevato numero di partizioni. Così facendo, però,
+risulterebbero troppo complessi e possono portare all'\emph{overfitting}
+del training set con il risultato di pessime prestazioni sul test
+set.
+
+È necessario, quindi, trovare una sorta di equilibrio tra profondità
+e complessità dell'albero per ottenere previsioni soddisfacenti su
+nuovi dati. 
+
+Per trovare questo equilibrio si utlizzano di solito tre approcci:
+\begin{enumerate}
+\item si imposta una profondità massima, intesa come distanza massima tra
+la radice e una foglia (\emph{max\_depth})
+\item si imposta un numero minimo di osservazioni che devono essere presenti
+in una foglia così da partizionare solo i nodi contenenti almeno un
+certo numero di dati (\emph{min\_sample\_leaf})
+\item si applica il cosidetto \emph{pruning} 
+\end{enumerate}
+%
+Dopo questa breve introduzione sugli alberi decisionali, vediamo nel
+dettaglio gli algoritmi utilizzati nello studio: \emph{random forest}
+e \emph{xgboost.} Questi altro non sono che evoluzioni dei \emph{decision
+trees} (si veda Figura \ref{fig:Evoluzione_alberi}).
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.5]{evoluzione_alberi}
+\caption{\emph{Evoluzione algoritmi ad albero}}
+\label{fig:Evoluzione_alberi}
+\end{figure}
+
+\subsection{Random Forest}
+
+Prima di parlare di foreste casuali, è necessario introdurre due concetti:
+il metodo \emph{ensemble }e il \emph{bagging}.
+
+Con \emph{``ensemble''} si intende qualsiasi algoritmo che utilizza
+contemporaneamente più modelli di apprendimento per migliorare la
+qualità del risultato che si otterrebbe da un singolo modello.
+
+Il \emph{bagging} (abbreviazione di \emph{bootstrap aggregation})
+è un esempio di metodo ensemble utilizzato per ridurre la varianza,
+evitare l'overfitting e migliorare l'accuratezza di un algoritmo di
+machine learning.
+
+Tramite questo metodo vengono generati dei dataset cosìdetti \emph{bootstrapped},
+ossia dei sottoinsiemi creati con un campionamento casuale semplice
+con ripetizione, di numerosità pari a quella del training set, effettuato
+proprio su quest'ultimo. Inoltre ognuno di questi dataset ha un corrispettivo
+\emph{out-of-bag (oob)} \emph{set}, composto dalle unità del training
+set non rientrate nel bootstraped set e per questo utilizzabili al
+pari del test set.
+
+A questo punto l'algoritmo scelto viene allenato su ognuno di questi
+bootstrapped dataset e, infine, viene effettuata la media (nel caso
+della regressione) di tutti i risultati ottenuti.
+
+Questa azione è detta ``bagging''.
+
+Le foreste casuali non sono altro che esemble di alberi di decisione
+allenati tramite bagging.
+
+A seguito del bagging su alberi decisionali si possono però riscontrare
+correlazioni trai vari alberi, andando quindi a limitare l'effetto
+della riduzione della varianza.
+
+Per evitare ciò, l'algoritmo del random forest introduce un ulteriore
+fattore di casualità che porta a una decorrelazione degli alberi.
+Nella costruzione dei singoli alberi, la variabile di split a ogni
+nodo non viene scelta considerando tutte le \emph{$p$} features disponibili,
+come negli alberi di decisione, ma viene scelta da un campione casuale
+di di $m<p$ variabili. Solitamente viene posto $m=\sqrt{p}$ se il
+problema è di classificazione, $m=\frac{p}{3}$ se di regressione.
+Se $m=p$ si ha semplicemente un algoritmo di bagging.
+
+L'algoritmo di base del random forest per un problema di regressione
+o classificazione è mostrato in \emph{The Elements of Statistical
+Learning}\cite{Statistical Learning} e qui riportato come Algoritmo
+\ref{alg:Random-Forest}.
+
+\begin{algorithm}
+\begin{enumerate}
+\item Dato un training set
+\item Indicato il numero di alberi da costruire ($n\_trees$)
+\item Per $i=1..n\_trees$:
+\begin{enumerate}
+\item Genera un campione bootstrap dei dati di training
+\item Genera un albero random forest per i dati bootstrapped ripetendo ricorsivamente
+i seguenti passi
+\begin{enumerate}
+\item Seleziona casualmente $m$ variabili dalle $p$ disponibili
+\item Tra queste $m$, scegli la variabile che restituisce lo split migliore
+\item Dividi il nodo in due nodi ``figli''
+\end{enumerate}
+\end{enumerate}
+\item Usa il criterio di stop scelto per determinare quando un albero è
+completo
+\item Restituisci l'ensemble di alberi\caption{Random Forest\label{alg:Random-Forest}}
+\end{enumerate}
+\end{algorithm}
+
+
+\subsubsection*{Iperparametri}
+
+Con il termine \emph{iperparametri} si intendono tutte quelle variabili
+che, all'interno dell'algoritmo, possono essere cambiati per ottenere
+performance migliori rispetto al modello ``base''.
+
+I valori finali vengono solitamente scelti applicando delle specifiche
+strategie di \emph{tuning} che permettono di iterare più volte l'algoritmo
+scelto cambiando ogni volta uno o più di questi iperparametri. È immediato
+intuire come questo processo possa estendere i tempi di elaborazione
+dell'output ma in molti casi mettere in pratica questa operazione
+può rivelarsi un'ottima strategia per ottenere performance migliori.
+
+Ogni iperparametro ha, inoltre, un proprio impatto sui risultati quindi
+è sempre bene studiarsi la documentazione ufficiale prima di procedere
+con qualsiasi strategia di tuning.
+
+Nel caso del random forest i principali iperparametri sono \cite{rf_hyper}:
+\begin{itemize}
+\item Il numero di alberi nella foresta ($n\_tree$): buona norma è iniziare
+usando $n\_tree=10*p$;
+\item Il numero di variabili da considerare a ogni split (indicato nelle
+sezioni precedenti con \emph{$m$}): di default si ha $m=\frac{p}{3}$
+nel caso di regressione;
+\item La complesità degli alberi: data da \emph{``node size''} (di default
+pari a $5$ per la regressione) o \emph{``max depth''} \cite{rf_complexity1,rf_complexity2,rf_complexity3};
+\item Lo schema di campionamento: di default viene utilizzato il bootstrapping
+ma è possibile cambiarlo;
+\item La regola con cui splittare i nodi intermedi.
+\end{itemize}
+In questo caso gli iperparametri con maggior impatto riguardano la
+scelta di $m$, parametro che quindi è sempre meglio inserire nella
+strategia di tuning. Gli altri hanno un'influenza minore sull'output
+finale ma non è conveniente escluderli dal tuning.
+
+\subsection{XGBoost}
+
+L'\emph{Extreme Gradient Boosting} (abbreviato \emph{XGBoost}) altro
+non è che una ottimizzazione del modello \emph{Gradient Boosting}
+che a suo volta deriva dal \emph{Boosting.}
+
+Segue una breve introduzione di questi concetti e si rimanda ai testi
+di Hastie\cite{Statistical Learning}, James \cite{introduction SL}
+e Lindholn \cite{sml-book} per un approfondimento.
+
+Nella sezione precedente si è visto come il bagging implica la creazione
+di nuovi dataset di training tramite la tecnica boostrap, l'evoluzione
+di un albero decisionale per ogni nuovo dataset e, infine, la combinazione
+di tutti gli alberi per restituire un unico output. Si ha quindi una
+elaborazione degli alberi in parallelo.
+
+Il \emph{boosting} segue un procedimento simile ma, al contrario,
+gli alberi sono addestrati in modo sequenziale, ossia ogni albero
+viene elaborato utilizzando gli errori degli alberi precedenti, migliorando
+quindi le prestazioni del modello mano a mano che vengono costruiti
+nuovi alberi. A ogni iterazione viene data quindi maggiore importanza
+ai dati su cui il modello performa peggio l'output finale è dato da
+una media ponderata dei risultati dei singoli alberi elaborati.
+
+Il metodo boosting è stato utilizzato come punto di partenza per sviluppare
+gli algoritmi \emph{Adaptive Boosting} (chiamato\emph{ AdaBoost})
+\cite{adaboost} e \emph{Gradient Boosting} \cite{gradient_boosting}. 
+
+Quest'ultimo migliora il boosting con l'introduzione della \emph{discesa
+del gradiente} come algoritmo di ottimizzazione per trovare la soluzione
+ottima. Misura iterativamente il gradiente della funzione di costo
+in un punto dato da specifici parametri e modifica tali valori cercando
+di minimizzare la suddetta funzione. In questo contesto assume molta
+importanza il cosìdetto \emph{learning rate}, il parametro che controlla
+la grandezza degli spostamenti sulla curva della funzione di perdita.
+Un valore troppo basso porta all'ottenimento di un modello più accurato
+a fronte di un incremento di iterazioni e quindi a una crescita dei
+tempi di elaborazione dell'output. Dall'altra parte, un valore troppo
+alto può comportare il salto dell'effettivo valore minimo della funzione,
+potenzialmente restituendone un valore più alto di quello iniziale.
+
+Il modello gradient boosting viene migliorato e ottimizzato nel 2016
+con l'introduzione dell'XGBoost grazie a Chen \& Guestrin\cite{xgboost_1}.
+
+Ciò che principalmente lo contraddistingue dall'algoritmo di origine
+sono gli iperparametri, descritti brevemente nella sezione successiva.
+
+\subsubsection*{Iperparametri}
+
+Come riportato anche nella documentazione ufficiale, XGBoost riprende
+gli iperparametri del boosting e degli algoritmi ad albero ma con
+alcuni vantaggi.
+\begin{itemize}
+\item Regolarizzazione: sono implementati tre parametri che aiutano a ridurre
+la complessità dell'algoritmo e a evitare l'overfitting
+\begin{itemize}
+\item Gamma: definito come moltiplicatore lagrangiano. Controlla la complessità
+di un singolo albero e indica la riduzione minima di perdita richiesta
+per procedere con la partizione del nodo. Varia tra $0$ e $\infty$;
+\item Alpha: restituisce una regolarizzazione di tipo \emph{$L_{1}$ }(detta
+\emph{lasso penalty}, \cite{introduction SL}). Limita l'influenza
+che possono avere le singole foglie di un albero sul risultato finale.
+Varia tra $0$ e $\infty$;
+\item Lambda: stessa funzione e stessi valori di \emph{alpha}. Restituisce
+una regolarizzazione di tipo $L_{2}$.
+\end{itemize}
+\item Arresto anticipato: l'algoritmo può essere interrotto anticipatamente
+se i nuovi alberi non offrono miglioramenti.
+\item Elaborazione in parallelo: il modello implementa una procedura per
+parallelizzare, e quindi velocizzare, il processo di calcolo sfruttando
+la GPU o Apache Spark
+\item Funzione di perdita: permette di utilizzare funzioni di costo customizzate
+\item Multilinguaggio: è stato sviluppato per vari ambienti quali R, Pyhton,
+Julia, Java e C++
+\end{itemize}
+Come avviene per gli iperparametri del random forest, anche in questo
+caso è consigliato attuare una strategia di tuning per trovare i valori
+che restituiscano il miglior risultato possibile.
+
+\subsection{Interpretabilità del Modello}
+
+Una volta creato il modello, effettuato l'eventuale tuning e ottenuto
+un output, fondamentale diventa il saper leggere e descrivere come
+l'algoritmo si è comportato, riuscendo così ad avere maggiore chiarezza
+anche sui risultati ottenuti.
+
+Di questo si occupano tutte quelle analisi rivolte all'interpretazione
+dei modelli, cercando di capire più nel dettaglio cosa, come e perchè
+è stato restituito quel preciso output.
+
+Per evitare incoerenza con gli obiettivi di questo testo, nel seguito
+sono riportate solo quelle analisi che sono state utilizzate nello
+studio su cui si basa questo lavoro.
+
+\subsubsection{Feature Importance}
+
+Con il termine \emph{feature importance} si intende quel tipo di analisi
+che ha come obiettivo il quantificare l'impatto delle singole variabili
+sul risultato finale.
+
+Segue un distinguo trai modelli visti nella sezione precedente
+
+\paragraph{Random Forest}
+
+Nel caso del random forest viene ripreso il calcolo effettuato in
+un modello di bagging e implementato con un'analisi permutativa.
+
+Per il bagging la procedura prevede, per ogni albero, la somma, per
+ogni variabile utilizzata nei partizionamenti, della riduzione della
+funzione di perdita associata a quella specifica variabile. Questo
+valore viene poi aggregato, per ogni variabile, tra tutti gli alberi.
+Le caratteristiche con la maggiore riduzione media, in riferimento
+alla funzione di perdita, sono considerate le più importanti.
+
+Nel random forest viene ripresa la procedura del bagging implementandolo
+facendo passare, per ogni albero, il campione out-of-bag lungo tutto
+l'albero registrando l'accuratezza della previsione. Dopodiché vengono
+permutati casualmente i valori di ogni variabile (una alla volta)
+e viene nuovamente calcolata l'accuratezza con il campione oob. La
+differenza trai due valori di accuratezza restituisce l'importanza
+della variabile i cui valori sono stati permutati. Le features su
+cui viene registrata la maggior differenza sono quelle più importanti.
+
+\paragraph{XGBoost}
+
+Essendoci alla base una struttura ad albero, il calcolo della feature
+importance per XGBoost segue quanto detto nel caso del random forest.
+In questo caso si hanno però a disposizione tre tipologie di misura:
+\begin{itemize}
+\item Gain: equivalentemente al random forest, indica il miglioramento dell'accuratezza
+del modello apportato da una variabile;
+\item Copertura: quantifica il numero relativo di osservazioni influenzate
+da ciascuna caratteristica
+\item Frequenza: rappresenta il numero relativo di volte che ciascuna variabile
+si presenta negli alberi del modello
+\end{itemize}
+
+\subsubsection{Dipendenza Parziale}
+
+Ulteriore aiuto nella lettura di un modello viene dalla dipendenza
+parziale.
+
+Questa misura, assieme al grafico associato (abbreviato come \emph{PDP}),
+aiuta a capire l'effetto marginale di una variabile sul risultato
+previsionale medio di un algoritmo, consentendo di capire se la relazione
+tra l'output e la variabile considerata sia lineare o più complesso.
+Ciò è possibile in quanto l'output del modello viene marginalizzato
+rispetto la distribuzione delle variabili che non interessano, mantenendo
+quindi la relazione tra la variabile di interesse e il risultato,
+restituendo così un'idea di come varia l'output considerando un effetto
+medio delle altre variabili.
+
+La funzione di dipendenza parziale viene descritta da Friedman (\cite{gradient_boosting}),
+e spiegata da Molnar (\cite{interpretable machine learning}), come: 
+
+\[
+\hat{f_{S}}(x_{S})=E_{X_{C}}\left[\hat{f}(x_{S},X_{C})\right]=\frac{1}{n}\sum_{i=1}^{n}\hat{f}(x_{S},x_{C}^{(i)}).
+\]
+
+$x_{S}$sono le variabili di interesse, quelle per cui si vogliono
+conoscere gli effetti sulla previsione. $S$ solitamente contiene
+al massimo, per motivi grafici, due variabili. $X_{C}$ sono tutte
+le altre variabili utilizzate nel modello (e nella funzione considerate
+come aleatorie).
+
+Per capirne come viene implementata questa funzione, sono riportati
+l'algoritmo base del calcolo della dipendenza parziale per un singolo
+predittore (Algoritmo \ref{alg:Dipendenza-Parziale}) e un'immagine
+che rende chiaro il meccanismo (Figura \ref{fig:PDP}, in rosso la
+variabile di interesse).
+
+\begin{algorithm}
+Dato un predittore $x$
+\begin{enumerate}
+\item Costruire una griglia di $j$ valori uniformemente distanziati attraverso
+la distribuzione di $x:\{x_{1},x_{2},...,x_{j}\}$
+\item Per $i$ in $\{1,...,j\}$:
+\begin{enumerate}
+\item Crea una copia del training set e sostituisci i valori di $x$con
+la costante $x_{i}$
+\item Applica il modello scelto
+\item Fai la media delle previsioni ottenute per ogni unità
+\end{enumerate}
+\item Plotta le previsioni medie ottenute rispetto i valori $x_{1},...,x_{j}$
+\end{enumerate}
+\caption{Dipendenza Parziale\label{alg:Dipendenza-Parziale}}
+\end{algorithm}
+
+\begin{figure}
+\includegraphics[width=15cm,height=10cm]{pdp-illustration}
+
+\caption{\emph{PDP (\protect\href{https://bradleyboehmke.github.io/HOML/}{Fonte})}
+\label{fig:PDP}}
+\end{figure}
+
+Come qualsiasi altra procedura, anche la dipendenza parziale ha vantaggi
+e svantaggi.
+
+\paragraph{Vantaggi}
+\begin{itemize}
+\item Facile interpretazione: la funzione di dipendenza parziale rappresenta
+la previsione media se si forzassero tutti i dati ad assumere quel
+determinato valore per la variabile di interesse.
+\item L'interpretazione è di tipo causale, si modifica una variabile e si
+misurano le variazioni nella previsione. Importante però è sottolineare
+come la relazione sia causale per il modello e non necessariamente
+anche per il mondo reale. È possibile stabilire delle ipotesi per
+raggiungere quest'ultimo risultato ma le metodologie richiedono uno
+studio specifico che va oltre gli scopi di questo lavoro \cite{pdp}.
+\end{itemize}
+
+\paragraph{Svantaggi}
+\begin{itemize}
+\item Se la variabile per cui viene calcolata la dipendenza parziale è fortemente
+correlata con le altre variabili, possono esserci problemi di rappresentazione.
+Una possibile soluzione è utilizzare l'\emph{Accumulated Local Effect
+plot }(ALE plot) che si basa sulla distribuzione condizionale invece
+che sulla marginale \cite{ale}.
+\item Vengono nascosti eventuali effetti eterogenei in quanto sono rappresentati
+gli effetti marginali medi. Una possibile soluzione consiste nell'utilizzare
+le \emph{Individual Conditional Expectation curves }(ICE) \cite{ice}.
+\end{itemize}
+
+\section{Apprendimento Non Supervisionato}
+
+«If we fit a predictive model using a supervised learning technique,
+then it is possible to \emph{check our work} by seeing how well our
+model predicts the response $Y$ on observations not used in fitting
+the model. However, in unsupervised learning, there is no way to check
+our work because we don't know the true answer -- the problem is
+unsupervised»\footnote{James G, \emph{An Introduction to Statistical Learning}, Springer,
+2021$^{2}$, p. 498}.
+
+Questa frase mette in risalto la differenza esistente tra le due tipologie
+di metodologie di analisi.
+
+Nell'apprendimento supervisionato si hanno $m$ variabili, osservate
+su $n$ unità, e una varaibile risposta $Y$, osservata anch'essa
+sulle $n$ unità, e l'obiettivo è ottenere una previsione di $Y$
+sfruttando le $X_{1},...,X_{m}$.
+
+Nell'apprendimento non supervisionato si hanno le variabili $X_{1},...,X_{m}$
+a cui però non è associata alcuna $Y$ su cui cercare di effettuare
+previsioni. L'obiettivo infatti è cercare informazioni su eventuali
+relazioni esistenti tra le $m$ variabili.
+
+Per la mancanza di una $Y$ di riferimento, questa tipologia di dati
+è chiamata \emph{unlabeled}.
+
+Questa tipologia di analisi, a differenza di quella supervisionata,
+ha molteplici utilizzi che si possono riassumere in tre categorie,
+elencate di seguito e per cui sono indicati gli algoritmi più utilizzati:
+\begin{itemize}
+\item Clustering: l'obiettivo è raggruppare unità con caratteristiche simili
+\begin{itemize}
+\item Clustering Partizionale (\emph{Partitioning Clustering})
+\item Clustering Gerarchico (\emph{Hierarchical Cluster Analysis, HCA})
+\item Clustering Spetttrale (\emph{Spectral Clusteringe})
+\item Modelli a Mistura Gaussiana (\emph{Gaussian Mixture Model})
+\item DBSCAN;
+\end{itemize}
+\item Anomaly detection: l'obiettivo è scovare unità che si discostano dalle
+altre (vedi Sezione \ref{subsec:Valori-Anomali})
+\begin{itemize}
+\item One-class SVM
+\item Isolation Forest
+\item Local Outlier Factor;
+\end{itemize}
+\item Riduzione dimensionalità
+\begin{itemize}
+\item Analisi delle Componenti Principali (\emph{Principal Component Analysis,
+PCA})
+\item Kernel PCA
+\item Autoencoders.
+\end{itemize}
+\end{itemize}
+Nelle analisi effettuate in questo studio si è scelto di introdurre
+solamente analisi di cluster per andare a rilevare eventuali pattern
+interni ai dati, perciò nella prossima sezione sarà approfondita esclusivamente
+questa tipologia di algoritmi, con maggiore focus riguardo l'algortimo
+che si è deciso di utilizzare.
+
+\subsection{Clustering}
+
+Segmentazioni della clientela per sistemi di raccomandazione. Ricerca
+per immagini. Segmentazione di immagini per \emph{object detection}.
+Ricerca di valori anomali.
+
+Questi sono solo alcuni esempi per cui si può fare ricorso alla \emph{cluster
+analysis}.
+
+Non c'è una definizione universale di cosa sia il ``clustering''.
+Dipende molto dal contesto e dal tipo di algoritmo che si adotta. 
+
+Tutti i possibili obiettivi, però, riguardano il raggruppare o segmentare
+una collezione di oggetti in sottoinsiemi, detti ``cluster'', in
+modo tale che quelli all'interno di ogni cluster sono più connessi
+tra loro rispetto agli oggetti che si trovano in altri cluster.
+
+Questa ``connessione'' tra unità è data dal grado di \emph{dissimilarità},
+una funzione che associa a ciascuna coppia di unità un valore numerico,
+rappresentante della diversità tra le due unità.
+
+Fondamentale diventa quindi la scelta della misura di dissimilarità.
+
+\subsubsection{Dissimilarità}
+
+Date $n$ unità, la dissimilarità $d$ tra due unità $x_{i}$,$x_{k}$($i,k=1..n$)
+è una funzione che associa alla coppia $(x_{i},x_{k})$ un valore
+numerico che quantifica la loro diversità, o dissimilarità, se è:
+\begin{itemize}
+\item non negativa: $d_{ik}\geq0$;
+\item nulla: $d_{ii}=0$;
+\item simmetrica: $d_{ik}=d_{li}$.
+\end{itemize}
+Questi valori sono poi riportati in una matrice quadrata, detta \emph{matrice
+di dissimilarità $D$}: 
+
+\[
+D=\left[\begin{array}{cccccccc}
+0 & d_{12} & \cdots & d_{1i} & \cdots & d_{1k} & \cdots & d_{1n}\\
+d_{21} & 0 & \cdots & d_{2i} & \cdots & d_{2k} & \cdots & d_{2n}\\
+\vdots & \vdots & 0 & \vdots & \cdots & \vdots & \cdots & \vdots\\
+d_{i1} & d_{i2} & \cdots & 0 & \cdots & d_{ik} & \cdots & d_{in}\\
+\vdots & \vdots & \cdots & \vdots & 0 & \vdots & \cdots & \vdots\\
+d_{k1} & d_{k2} & \cdots & d_{ki} & \cdots & 0 & \cdots & d_{kn}\\
+\vdots & \vdots & \cdots & \vdots & \cdots & \vdots & 0 & \vdots\\
+d_{n1} & d_{n2} & \cdots & d_{ni} & \cdots & d_{nk} & \cdots & 0
+\end{array}\right]
+\]
+
+Se inoltre viene soddisfatta la disuguaglianza triangolare $d_{ik}\leq d_{il}+d_{kl}$
+per $i,l,k=1..n$, la diversità è detta \emph{distanza}. 
+
+Raramente però si verifica quest'ultima condizione.
+
+Riprendendo la notazione di Hastie (\cite{Statistical Learning}),
+in generale, lavorando in uno spazio $p-$dimensionale, la dissimilarità
+considerando $j-$esima variabile ($j=1..p$) è definita come $d_{j}(x_{ij},x_{kj})$,
+e da questa si ottiene la dissimilarità tra le due unità su tutte
+le $p$ variabili, $D(x_{i},x_{k})=\sum_{j=1}^{p}d_{j}(x_{ij},x_{kj})$. 
+
+Nello specifico la dissimilarità viene scelta in base alla tipologia
+delle variabili, e spesso si preferisce assegnare un peso diverso
+ad ogni variabile. Si ha pertanto:
+\begin{itemize}
+\item Variabili qualitative. 
+
+In caso di variabili binarie, le modalità delle unità $i$ e $k$
+sono disposte nelle matrici $C_{i}$ e $C_{k}$, ciascuna di dimensione
+$p\times2$. 
+
+Viene quindi costruita la matrice $C_{i}^{'}C_{l}=\left[\begin{array}{cc}
+c_{00} & c_{01}\\
+c_{10} & c_{11}
+\end{array}\right]$ in cui $c_{uv}$ rappresenta la frequenza delle variabili che presentano,
+per la coppia di unità $(i,k)$, le modalità $(u,v)$ con $u,v=\{0,1\}$.
+Da questa matrice ottengo le informazioni per la misura delle dissimilarità,
+quali:
+\begin{itemize}
+\item Jaccard-Needham: $\frac{c_{10}+c_{01}}{c_{11}+c_{10}+c_{01}}$;
+\item Yule: $\frac{c_{10}*c_{01}}{c_{11}*c_{00}+c_{10}*c_{01}}$;
+\item Distanza Euclidea: $\sqrt{c_{10}+c_{01}}$;
+\item Varianza: $\frac{c_{10}+c_{01}}{4*p}$.
+\end{itemize}
+\item Variabili quantitative.
+
+Data una matrice dei pesi $W$ e un parametro $r$, le misure più
+frequentemente utilizzate sono:
+\begin{itemize}
+\item Distanza di Minkowski di ordine $r$: $\sqrt[r]{\sum_{j=1}^{p}\left|x_{ij}-x_{kj}\right|^{r}w_{j}}$;
+\item Distanza della città a blocchi: $\sum_{j=1}^{p}\left|x_{ij}-x_{kj}\right|w_{j}$;
+\item Distanza Euclidea: $\sqrt{\sum_{j=1}^{p}\left|x_{ij}-x_{kj}\right|^{2}w_{j}}$;
+\item Distanza di Camberra: $\frac{\left|x_{ij}-x_{kj}\right|}{(\left|x_{ij}\right|+\left|x_{kj}\right|)}$.
+\end{itemize}
+\item Variabili miste.
+
+In questo caso si hanno due possibili approcci:
+\begin{itemize}
+\item Convertire tutte le variabili nella tipologia più frequente;
+\item Media ponderata delle dissimilarità delle $p$ variabili: $d_{ik}=\frac{\sum_{j=1}^{p}w_{ikj}d_{ikj}}{\sum_{j=1}^{p}w_{ikj}}$.
+\end{itemize}
+\end{itemize}
+A prescindere dalla misuura di dissimilarità utilizzata, è sempre
+consigliato ricorrere a una standardizzazione dei dati prima di calcolare
+la matrice $D$.
+
+\begin{comment}
+le unità sono i e k. l è l'unità ponte. j è la variabile e in tutto
+ho p variabili
+
+islrv2
+
+hands on
+
+esslii
+
+clustering
+\end{comment}
+
+
+\section{Apprendimento Per Rinforzo}
+
+L'apprendimento per rinforzo, conosciuto meglio con il termine inglese
+\emph{reinforcement learning} (RL), costituisce una branca piuttosto
+recente del machine learning.
+
+Nonostante i primi lavori risalgano al 1998 (\cite{reinforcement}),
+solo negli ultimi dieci anni si è vista una crescita esponenziale
+di lavori basati su questa tipologia di modelli.
+
+In questo caso il sistema di apprendimento è chiamato \emph{agent}
+ed è capace di osservare l'ambiente, selezionare ed eseguire azioni
+per ottenere in cambio ricompense o penalità. 
+
+All'agent non viene però detto a priori quali azioni deve intraprendere
+ma tramite un sistema di ``trial and error'' impara autonomamente
+la strategia migliore, detta \emph{policy}, per ottenere la maggior
+ricompensa possibile. 
+
+La \emph{policy}, quindi, determina l'azione che l'\emph{agent} deve
+eseguire quando si trova in una determinata situazione.
+
+L'apprendimento per rinforzo è quindi diverso dall'apprendimento supervisionato
+in quanto in quest'ultimo il sistema di apprendimento si basa su dati
+etichettati e l'etichetta rappresenta esattamente l'azione corretta
+che il sistema dovrebbe fare in una situazione simile a quella descritta
+dai predittori. Nell'apprendimento per rinforzo non è possibile avere
+una situazione simile in quanto difficilmente si riescono a ottenere
+dati etichettati per tutte le situazioni in cui l'agent dovrebbe agire,
+e deve quindi essere in grado di imparare dall'esperienza.
+
+Risulta diverso anche dall'apprendimento non supervisionato, e in
+questo caso la diversità risiede negli obiettivi. L'apprendimento
+non supervisionato va alla ricerca di strutture trai dati non etichettati,
+come somiglianze e differenze. Il reinforcement learning cerca invece
+di trovare quella serie di azioni che permettano di massimizzare la
+ricompensa totale.
+
+In questo contesto assumono un ruolo centrale alcuni termini che vanno
+a descrivere l'ambiente in cui lavora un tale algoritmo:
+\begin{itemize}
+\item Ambiente: l'ambiente fisico in cui opera l'agent;
+\item Stato: situazione corrente dell'agent;
+\item Ricompensa: feedback ricevuto dall'ambiente;
+\item Policy: metodo che mappa lo stato dell'agent rispetto le azioni;
+\item Valore: ricompensa futura che l'agent riceverebbe compiendo un'azione
+in un determinato stato.
+\end{itemize}
+Per come si configura, risultano chiare le potenzialità di applicabilità
+di questo algoritmo in molteplici settori, quali, ad esempio:
+\begin{itemize}
+\item Auto a guida autonoma \cite{RL_guida_autonoma1,RL_guida_autonoma2};
+\item Natural Language Processing (NLP) \cite{RL_nlp1,RL_nlp2,RL_nlp3};
+\item Sanità \cite{RL_sanit=0000E0};
+\item Sistemi di produzione \cite{RL_produzione};
+\item Sistemi di raccomandazione \cite{RL_raccomandazione};
+\item Gaming \cite{RL_gaming};
+\item Marketing \cite{RL_marketing}.
+\end{itemize}
+Per le finalità di questo lavoro non si ritiene opportuno approfondire
+maggiormente questo argomento e si rimanda a \emph{Reinforcement Learning:
+An Introduction} di Sutton \& Barto, considerato uno dei migliori
+libri per iniziare a studiare questa tipologia di algoritmi.
+
+\section{Descrizione Dataset}
+
+fds
+
+\chapter{Analisi e Risultati}
+
+das
+
+\chapter{Conclusioni}
+
+dasd
+
+\section{Sitografia}
+
+XGBoost: https://github.com/dmlc/xgboost
+
+Feature importance rf: https://explained.ai/rf-importance/index.html
+
+feature imp xgb: https://towardsdatascience.com/be-careful-when-interpreting-your-features-importance-in-xgboost-6e16132588e7
+
+\emph{}%
+\begin{comment}
+se gli autori sono più di tre, metto \emph{et al.} in questo caso
+va solo il cognome
+\end{comment}
+
+\listoffigures
+
+\begin{thebibliography}{10}
+\bibitem{Carisi}Carisi \emph{et al., }``Development and assessment
+of uni- and multivariable flood loss models for Emilia-Romagna (Italy)'',
+in \emph{Natural Hazards and Earth System Sciences}, XVIII (2017),
+pp. 2057-2079, doi:\href{https://doi.org/10.5194/nhess-18-2057-2018}{https://doi.org/10.5194/nhess-18-2057-2018}
+
+\bibitem{graham}Graham \emph{et al.}, ``Method for handling missing
+data'', in \emph{Handbook of Psychology: Research methods in psychology},
+II (2003), pp. 87-114, doi:\href{https://doi.org/10.1002/0471264385.wei0204}{https://doi.org/10.1002/0471264385.wei0204}
+
+\bibitem{rubin-little}Rubin, D., Little, R.J.A., \emph{Statistical
+analysis with missing data}, 1987
+
+\bibitem{wayman}Wayman, J., \emph{Multiple imputation for missing
+data: what is it and how can i use it?}, 2003
+
+\bibitem{cameron}Cameron, A.C., Trivedi, P., \emph{Microeconometrics:
+methods and applications}, 2005
+
+\bibitem{soley}Soley-Bori, M., ``Dealing with missing data: Key
+assumptions and methods for applied analysis'', 2013
+
+\bibitem{grubbs}Grubbs , F.E., ``Procedures for detecting outlying
+observations in samples'', 1969
+
+\bibitem{hawkins}Hawkins, D.M.,\emph{ Identification of outliers},
+Springer, 1980
+
+\bibitem{barnett}Barnett, V., Lewis, T., \emph{Outliers in statistical
+data}, Wiley, 1994$^{3}$
+
+\bibitem{bengal}Ben-Gal, I., ``Outlier detection'', in \emph{Data
+Mining and Knowledge Discovery Handbook} (2005), pp. 131-146
+
+\bibitem{isolation forest}F. T. Liu, K. M. Ting and Z. Zhou, ``Isolation
+forest'',\emph{ 2008 Eighth IEEE International Conference on Data
+Mining}, 2008, pp. 413-422
+
+\bibitem{lof}Breunig \emph{et al.}, ``LOF: Identifying density-based
+local outliers'', 2000
+
+\bibitem{dbscan1}Ester \emph{et al.}, ``A density-based algorithm
+for discovering clusters'', 1996
+
+\bibitem{dbscan2}Thang, T.M, Kim, J., ``The Anomaly Detection by
+Using DBSCAN Clustering with Multiple Parameters'', \emph{2011 International
+Conference on Information Science and Applications}, 2011, pp. 1-5
+
+\bibitem{dbscan3}Behera, S., Rani, R., ``Comparative analysis of
+density based outlier detection techniques on breast cancer data using
+hadoop and map reduce'', \emph{2016 International Conference on Inventive
+Computation Technologies (ICICT)}, 2016, pp. 1-4
+
+\bibitem{geochemistry}Filzmoser, P., Garrett, R., Reimann, C., ``Multivariate
+outlier detection in exploration geochemistry'', in \emph{Computers
+\& Geosciences}, XXXI (2005), pp. 579-587
+
+\bibitem{mahalanobis1}Filzmoser, P., ``A multivariate outlier detection
+method'', 2004
+
+\bibitem{mahalanobis2}Warren, R., Smith, R.F., Cybenko, A.K., ``Use
+of Mahalanobis distance for detecting outliers and outlier clusters
+in markedly non-normal data: a vehicular traffic example'', 2011
+
+\bibitem{flood1}Chinh \emph{et al.}, ``Multi-variate analyses of
+flood loss in Can Tho city, Mekong delta'', in \emph{Water}, VIII
+(2016)
+
+\bibitem{flood2}Merz \emph{et al.}, ``Multi-variate flood damage
+assessment: a tree-based data-mining approach'', in \emph{Nat. Hazards
+Earth Syst. Sci.}, XIII (2013), pp. 53-64
+
+\bibitem{Statistical Learning}Hastie, T., Tibshirani, R., Friedman,
+J., \emph{The elements of statistical learning}, Springer, 2017$^{2}$
+
+\bibitem{introduction SL}James, G., Witten, D., Hastie, T., Tibshirani,
+R., \emph{An introduction to statistical learning}, Springer, 2021$^{2}$
+
+\bibitem{hands on - python}Géron, A., \emph{Hands-on machine learning
+with scikit-learn, keras \& tensorflow}, O'Reilly Media, 2019$^{2}$
+
+\bibitem{hands-on R}Boehmke, B., Greenwell, B., \emph{Hands-on machine
+learning with R}, Chapman and Hall/CRC, 2019
+
+\bibitem{interpretable machine learning}Molnar, C., \emph{Interpretable
+machine learning}, 2020
+
+\bibitem{cart}Breiman \emph{et al.}, \emph{Classification and regression
+trees}, Chapman and Hall/CRC, 1984
+
+\bibitem{Rf 1}Breiman, L., \textquotedblleft Random Forests\textquotedblright{}
+in \emph{Machine Learning}, XLV (2001), pp. 5-32
+
+\bibitem{sml-book}Lindholm \emph{et al.}, \emph{Machine Learning
+- A First Course for Engineers and Scientists}, Cambridge University
+Press, 2021
+
+\bibitem{gradient_boosting}Friedman, J.H., ``Greedy Function Approximation:
+A Gradiend Boosting Machine'', in \emph{The Annals of Statistics},
+XXIX (2001), pp. 1189-1232
+
+\bibitem{adaboost}Freund, Y., Schapire, R.E., ``A Decision-Theoretic
+Generalization of On-Line Learning and an Application to Boosting'',
+in \emph{Journal of Computer and System Sciences}, LV (1997), pp.
+119-139
+
+\bibitem{xgboost_1}Chen, T., Guestrin C., ``XGBoost: A Scalable
+Tree Boosting System'', in \emph{Proceedings of the 22nd ACM SIGKDD
+International Conference on Knowledge Discovery and Data Mining},
+2016, pp. 785-794
+
+\bibitem{rf_hyper}Probst, P., Wright, M.N., Boulesteix, A., ``Hyperparameters
+and tuning strategies for random forest'', in \emph{WIREs: Data Mining
+and Knowledge Discovery}, IX (2019)
+
+\bibitem{rf_complexity1}Díaz-Uriarte, R., Alvarez de Andrés, S.,
+``Gene selection and classification of microarray data using random
+forest'', in \emph{BMC Bioinformatics}, 2006
+
+\bibitem{rf_complexity2}Goldstein, B.A., Polley, E.C., Briggs, F.B.,
+``Random Forests for Genetic Association Studies'', in \emph{Statistical
+Applications in Genetics and Molecular Biology}, X (2011)
+
+\bibitem{rf_complexity3}Segal, M.R., ``Machine Learning Benchmarks
+and Random Forest Regression'', in \emph{UCSF: Center for Bioinformatics
+and Molecular Biostatistics}, 2004, \href{https://escholarship.org/uc/item/35x3v9t4}{https://escholarship.org/uc/item/35x3v9t4}
+
+\bibitem{rf_tuning}Scornet, E., Coeurjolly, J.F., Leclercq-Samson,
+A., ``Tuning parameters in random forests'', in \emph{Esaim:Proceedings}
+\emph{and Surveys}, LX (2017), pp. 144-162, doi:\href{https://doi.org/10.1051/proc/201760144}{https://doi.org/10.1051/proc/201760144}
+
+\bibitem{pdp}Zhao, Q., Hastie, T., ``Casual interpretations of black-box
+models'', in \emph{Journal of Business \& Economic Statistics}, XXXIX
+(2021), pp. 272-281, doi:\href{https://doi.org/10.1080/07350015.2019.1624293}{https://doi.org/10.1080/07350015.2019.1624293}
+
+\bibitem{ale}Apley, D.W., Zhu, J., ``Visualizing the effects of
+predictor variables in black box supervised learning models'', in
+\emph{Journal of the Royal Statistical Society. Series B: Statistical
+Methodology}, LXXXII (2020), pp. 1059-1086, doi:\href{https://doi.org/10.1111/rssb.12377}{https://doi.org/10.1111/rssb.12377}
+
+\bibitem{ice}Goldstein\emph{ et al.}, ``Peeking Inside the Black
+Box: Visualizing Statistical Learning with Plots of Individual Conditional
+Expectation'', in \emph{Journal of Computational and Graphical Statistics},
+XXIV (2015), pp. 44-65, doi:\href{https://doi.org/10.1080/10618600.2014.907095}{https://doi.org/10.1080/10618600.2014.907095}
+
+\bibitem{reinforcement}Sutton, R.S., Barto, A.G., \emph{Reinforcement
+Learning: An Introduction}, MIT Press, 1998
+
+\bibitem{RL_guida_autonoma1}Kiran \emph{et al.}, ``Deep Reinforcement
+Learning for Autonomous Driving: A Survey'', in \emph{IEEE Transactions
+on Intelligent Transportation Systems}, 2021, pp. 1-18, doi:\href{https://doi.org/10.1109/TITS.2021.3054625}{https://doi.org/10.1109/TITS.2021.3054625}
+
+\bibitem{RL_guida_autonoma2}Balaji \emph{et al.}, ``DeepRacer: Educational
+Autonomous Racing Platform for Experimentation with Sim2Real Reinforcement
+Learning'', 2019, doi:\href{https://doi.org/10.48550/arXiv.1911.01562}{https://doi.org/10.48550/arXiv.1911.01562}
+
+\bibitem{RL_nlp1}Paulus, R., Xiong, C., Socher, R., ``A Deep Reinforced
+Model for Abstractive Summarization'', 2017, doi:\href{https://doi.org/10.48550/arXiv.1705.04304}{https://doi.org/10.48550/arXiv.1705.04304}
+
+\bibitem{RL_nlp2}Grissom II \emph{et al.}, ``Don't Until the Final
+Verb Wait: Reinforcement Learning for Simultaneous Machine Translation'',
+in \emph{Proceedings of the 2014 Conference on Empirical Methods in
+Natural Language Processing}, 2014, pp. 1342-1352, doi:\href{http://dx.doi.org/10.3115/v1/D14-1140}{http://dx.doi.org/10.3115/v1/D14-1140}
+
+\bibitem{RL_nlp3}Li \emph{et al.}, ``Deep Reinforcement Learning
+for Dialogue Generation'', in \emph{Proceedings of the 2016 Conference
+on Empirical Methods in Natural Language Processing}, 2016, pp. 1192-1202,
+doi:\href{http://dx.doi.org/10.18653/v1/D16-1127}{http://dx.doi.org/10.18653/v1/D16-1127}
+
+\bibitem{RL_sanit=0000E0}Yu, C., Jiming, L., Nemati, S., ``Reinforcement
+Learning in Healthcare: A Survey'', 2019, doi:\href{https://doi.org/10.48550/arXiv.1908.08796}{https://doi.org/10.48550/arXiv.1908.08796}
+
+\bibitem{RL_produzione}Gauci \emph{et al.}, ``Horizon: Facebook's
+Open Source Applied Reinforcement Learning Platform'', 2018, doi:\href{https://doi.org/10.48550/arXiv.1811.00260}{https://doi.org/10.48550/arXiv.1811.00260}
+
+\bibitem{RL_raccomandazione}Zheng \emph{et al.}, ``DRN: A Deep Reinforcement
+Learning Framework for News Recommendation'', in \emph{WWW 2018:
+proceedings of the 2018 World Wide Web Conference}, pp. 167-176, doi:
+\href{https://doi.org/10.1145/3178876.3185994}{https://doi.org/10.1145/3178876.3185994}
+
+\bibitem{RL_gaming}Silver \emph{et al.}, ``Mastering the game of
+Go without human knowledge'', in \emph{Nature}, DL (2017), pp. 354-359,
+doi: \href{https://doi.org/10.1038/nature24270}{https://doi.org/10.1038/nature24270}
+
+\bibitem{RL_marketing}Jin \emph{et al.}, ``Real-Time Bidding with
+Multi-Agent Reinforcement Learning in Display Advertising'', in \emph{CIKM
+'18: Proceedings of the 27th ACM International Conference on Information
+and Knowledge Management}, pp. 2193-2201, doi:\href{https://doi.org/10.1145/3269206.3272021}{https://doi.org/10.1145/3269206.3272021}
+\end{thebibliography}
+
+\end{document}
+
