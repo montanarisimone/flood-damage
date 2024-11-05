@@ -25,4 +25,4 @@ https://www.lodeproject.polimi.it/modena-flood-showcase
 
 *I'm not an expert, I'm a student and newbie in ML world. If you have any comments or suggestions, feel free to ping me*
 
-*Read the whole work: https://github.com/montanarisimone/flood-damage/blob/main/File/Thesis.pdf*
+*Read the whole work (IT): https://github.com/montanarisimone/flood-damage/blob/main/File/Thesis.pdf*
